@@ -76,7 +76,7 @@ This platform helps small UK food businesses (cafés, bakeries, food trucks) com
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/ezzaansar/Natasha-s-Law-Compliance-Platform.git
 cd natasha-law-mvp
 
 # Install dependencies
