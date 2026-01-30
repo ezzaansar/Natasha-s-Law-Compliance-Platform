@@ -3,29 +3,31 @@ import IngredientForm from './components/IngredientForm';
 import IngredientList from './components/IngredientList';
 import RecipeDemo from './components/RecipeDemo';
 import Dashboard from './components/Dashboard';
+import { ToastProvider, useToast } from './components/Toast';
+import ConfirmModal from './components/ConfirmModal';
+import SearchFilter from './components/SearchFilter';
 import { SAMPLE_INGREDIENTS, SAMPLE_RECIPES } from './data/sampleData';
 
-function App() {
+function AppContent() {
   const [ingredients, setIngredients] = useState(() => {
-    // Load from localStorage on initial render
     const saved = localStorage.getItem('ingredients');
     return saved ? JSON.parse(saved) : SAMPLE_INGREDIENTS;
   });
 
   const [recipes, setRecipes] = useState(() => {
-    // Load recipes from localStorage
     const saved = localStorage.getItem('recipes');
     return saved ? JSON.parse(saved) : SAMPLE_RECIPES;
   });
 
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [filters, setFilters] = useState({ searchTerm: '', allergenFilter: '' });
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, type: null, id: null, name: '' });
+  const { addToast } = useToast();
 
-  // Save to localStorage whenever ingredients change
   useEffect(() => {
     localStorage.setItem('ingredients', JSON.stringify(ingredients));
   }, [ingredients]);
 
-  // Save recipes to localStorage
   useEffect(() => {
     localStorage.setItem('recipes', JSON.stringify(recipes));
   }, [recipes]);
@@ -35,9 +37,13 @@ function App() {
   };
 
   const handleDeleteIngredient = (id) => {
-    if (window.confirm('Are you sure you want to delete this ingredient?')) {
-      setIngredients(prev => prev.filter(ing => ing.id !== id));
-    }
+    const ingredient = ingredients.find(ing => ing.id === id);
+    setDeleteModal({
+      isOpen: true,
+      type: 'ingredient',
+      id,
+      name: ingredient?.name || 'this ingredient'
+    });
   };
 
   const handleAddRecipe = (newRecipe) => {
@@ -45,10 +51,42 @@ function App() {
   };
 
   const handleDeleteRecipe = (id) => {
-    if (window.confirm('Are you sure you want to delete this recipe?')) {
-      setRecipes(prev => prev.filter(recipe => recipe.id !== id));
-    }
+    const recipe = recipes.find(r => r.id === id);
+    setDeleteModal({
+      isOpen: true,
+      type: 'recipe',
+      id,
+      name: recipe?.name || 'this recipe'
+    });
   };
+
+  const confirmDelete = () => {
+    if (deleteModal.type === 'ingredient') {
+      setIngredients(prev => prev.filter(ing => ing.id !== deleteModal.id));
+      addToast(`${deleteModal.name} deleted`, 'success');
+    } else if (deleteModal.type === 'recipe') {
+      setRecipes(prev => prev.filter(r => r.id !== deleteModal.id));
+      addToast(`${deleteModal.name} deleted`, 'success');
+    }
+    setDeleteModal({ isOpen: false, type: null, id: null, name: '' });
+  };
+
+  const cancelDelete = () => {
+    setDeleteModal({ isOpen: false, type: null, id: null, name: '' });
+  };
+
+  // Filter ingredients based on search and allergen filter
+  const filteredIngredients = ingredients.filter(ingredient => {
+    const matchesSearch = !filters.searchTerm ||
+      ingredient.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+      (ingredient.supplierName && ingredient.supplierName.toLowerCase().includes(filters.searchTerm.toLowerCase()));
+
+    const matchesAllergen = !filters.allergenFilter ||
+      ingredient.allergens[filters.allergenFilter] ||
+      ingredient.mayContain[filters.allergenFilter];
+
+    return matchesSearch && matchesAllergen;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -106,18 +144,8 @@ function App() {
               }`}
             >
               <div className="flex items-center space-x-2">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 <span>Dashboard</span>
               </div>
@@ -132,18 +160,8 @@ function App() {
               }`}
             >
               <div className="flex items-center space-x-2">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 <span>Ingredient Management</span>
               </div>
@@ -158,18 +176,8 @@ function App() {
               }`}
             >
               <div className="flex items-center space-x-2">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 <span>Recipe Demo</span>
               </div>
@@ -186,8 +194,10 @@ function App() {
         {activeTab === 'ingredients' && (
           <div className="space-y-6">
             <IngredientForm onAddIngredient={handleAddIngredient} />
+            <SearchFilter onFilterChange={setFilters} />
             <IngredientList
-              ingredients={ingredients}
+              ingredients={filteredIngredients}
+              totalCount={ingredients.length}
               onDeleteIngredient={handleDeleteIngredient}
             />
           </div>
@@ -216,7 +226,26 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        title={`Delete ${deleteModal.type === 'ingredient' ? 'Ingredient' : 'Recipe'}?`}
+        message={`Are you sure you want to delete "${deleteModal.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        variant="danger"
+      />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
   );
 }
 

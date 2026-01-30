@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useToast } from './Toast';
 
 function RecipeBuilder({ ingredients, onAddRecipe }) {
   const [recipeName, setRecipeName] = useState('');
@@ -6,10 +7,11 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
   const [currentIngredient, setCurrentIngredient] = useState('');
   const [currentQuantity, setCurrentQuantity] = useState('');
   const [currentUnit, setCurrentUnit] = useState('g');
+  const { addToast } = useToast();
 
   const handleAddIngredient = () => {
     if (!currentIngredient || !currentQuantity) {
-      alert('Please select an ingredient and enter a quantity');
+      addToast('Please select an ingredient and enter a quantity', 'warning');
       return;
     }
 
@@ -26,6 +28,8 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
       }
     ]);
 
+    addToast(`${ingredient.name} added to recipe`, 'success');
+
     // Reset fields
     setCurrentIngredient('');
     setCurrentQuantity('');
@@ -33,19 +37,21 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
   };
 
   const handleRemoveIngredient = (index) => {
+    const removed = selectedIngredients[index];
     setSelectedIngredients(prev => prev.filter((_, i) => i !== index));
+    addToast(`${removed.ingredientName} removed`, 'info');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!recipeName.trim()) {
-      alert('Please enter a recipe name');
+      addToast('Please enter a recipe name', 'error');
       return;
     }
 
     if (selectedIngredients.length === 0) {
-      alert('Please add at least one ingredient');
+      addToast('Please add at least one ingredient', 'error');
       return;
     }
 
@@ -61,6 +67,7 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
     };
 
     onAddRecipe(newRecipe);
+    addToast(`Recipe "${recipeName.trim()}" created!`, 'success');
 
     // Reset form
     setRecipeName('');
@@ -68,12 +75,10 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
     setCurrentIngredient('');
     setCurrentQuantity('');
     setCurrentUnit('g');
-
-    alert('Recipe created successfully!');
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Create New Recipe</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -86,7 +91,7 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
             type="text"
             value={recipeName}
             onChange={(e) => setRecipeName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
             placeholder="e.g., Chocolate Croissant"
           />
         </div>
@@ -103,7 +108,7 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
               <select
                 value={currentIngredient}
                 onChange={(e) => setCurrentIngredient(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
               >
                 <option value="">Select ingredient...</option>
                 {ingredients.map(ing => (
@@ -122,7 +127,7 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
                 type="number"
                 value={currentQuantity}
                 onChange={(e) => setCurrentQuantity(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
                 placeholder="500"
                 min="0"
                 step="0.1"
@@ -136,7 +141,7 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
               <select
                 value={currentUnit}
                 onChange={(e) => setCurrentUnit(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
               >
                 <option value="g">g</option>
                 <option value="ml">ml</option>
@@ -151,7 +156,7 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
           <button
             type="button"
             onClick={handleAddIngredient}
-            className="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 transition-colors"
+            className="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 hover:shadow-md transition-all duration-200"
           >
             + Add to Recipe
           </button>
@@ -167,7 +172,7 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
               {selectedIngredients.map((ing, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between bg-gray-50 p-3 rounded-md"
+                  className="flex items-center justify-between bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors duration-150"
                 >
                   <div className="flex items-center space-x-3">
                     <span className="text-gray-700 font-medium">{ing.ingredientName}</span>
@@ -178,7 +183,7 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
                   <button
                     type="button"
                     onClick={() => handleRemoveIngredient(idx)}
-                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                    className="text-red-600 hover:text-red-800 text-sm font-medium transition-colors"
                   >
                     Remove
                   </button>
@@ -191,7 +196,7 @@ function RecipeBuilder({ ingredients, onAddRecipe }) {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           Create Recipe
         </button>

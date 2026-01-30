@@ -49,7 +49,7 @@ function Dashboard({ ingredients }) {
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Ingredients */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Ingredients</p>
@@ -64,7 +64,7 @@ function Dashboard({ ingredients }) {
         </div>
 
         {/* Ingredients with Allergens */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">With Allergens</p>
@@ -79,7 +79,7 @@ function Dashboard({ ingredients }) {
         </div>
 
         {/* Cross-Contamination Risks */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">May Contain Warnings</p>
@@ -94,7 +94,7 @@ function Dashboard({ ingredients }) {
         </div>
 
         {/* Allergen Types Tracked */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Allergen Types Tracked</p>
@@ -110,7 +110,7 @@ function Dashboard({ ingredients }) {
       </div>
 
       {/* Top Allergens Chart */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
         <h3 className="text-xl font-bold text-gray-800 mb-4">Most Common Allergens</h3>
         {topAllergens.length > 0 ? (
           <div className="space-y-4">

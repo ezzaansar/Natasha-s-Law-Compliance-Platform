@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { calculateRecipeAllergens } from '../utils/calculateAllergens';
 import RecipeBuilder from './RecipeBuilder';
+import LabelGenerator from './LabelGenerator';
 
 function RecipeDemo({ recipes, ingredients, onAddRecipe, onDeleteRecipe }) {
   const [showBuilder, setShowBuilder] = useState(false);
@@ -18,7 +19,7 @@ function RecipeDemo({ recipes, ingredients, onAddRecipe, onDeleteRecipe }) {
   return (
     <div className="space-y-6">
       {/* Header with Toggle */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Recipe Management</h2>
@@ -86,7 +87,7 @@ function RecipeDemo({ recipes, ingredients, onAddRecipe, onDeleteRecipe }) {
               const { contains, mayContain } = calculateRecipeAllergens(recipeIngredients);
 
               return (
-                <div key={recipe.id} className="bg-white rounded-lg shadow-md p-6">
+                <div key={recipe.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-2xl font-bold text-gray-800 mb-1">{recipe.name}</h3>
@@ -94,12 +95,18 @@ function RecipeDemo({ recipes, ingredients, onAddRecipe, onDeleteRecipe }) {
                         Created {new Date(recipe.createdAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <button
-                      onClick={() => onDeleteRecipe(recipe.id)}
-                      className="text-red-600 hover:text-red-800 text-sm font-medium"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex items-center space-x-2">
+                      <LabelGenerator recipe={recipe} ingredients={ingredients} />
+                      <button
+                        onClick={() => onDeleteRecipe(recipe.id)}
+                        className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete
+                      </button>
+                    </div>
                   </div>
 
                   {/* Ingredient Breakdown */}

@@ -1,7 +1,9 @@
 import { getAllergenNames, exportIngredientsToCSV } from '../utils/exportToCSV';
 
-function IngredientList({ ingredients, onDeleteIngredient }) {
-  if (ingredients.length === 0) {
+function IngredientList({ ingredients, totalCount, onDeleteIngredient }) {
+  const isFiltered = totalCount !== undefined && totalCount !== ingredients.length;
+
+  if (totalCount === 0 || (totalCount === undefined && ingredients.length === 0)) {
     return (
       <div className="bg-gray-50 rounded-lg p-8 text-center">
         <svg
@@ -23,15 +25,46 @@ function IngredientList({ ingredients, onDeleteIngredient }) {
     );
   }
 
+  if (ingredients.length === 0 && isFiltered) {
+    return (
+      <div className="bg-gray-50 rounded-lg p-8 text-center">
+        <svg
+          className="mx-auto h-12 w-12 text-gray-400 mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+        <h3 className="text-lg font-medium text-gray-900 mb-1">No matching ingredients</h3>
+        <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-800">
-          Ingredient Library ({ingredients.length})
-        </h2>
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">
+            Ingredient Library
+          </h2>
+          <p className="text-sm text-gray-500">
+            {isFiltered ? (
+              <>Showing {ingredients.length} of {totalCount} ingredients</>
+            ) : (
+              <>{ingredients.length} ingredient{ingredients.length !== 1 ? 's' : ''}</>
+            )}
+          </p>
+        </div>
         <button
           onClick={() => exportIngredientsToCSV(ingredients)}
-          className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
         >
           <svg
             className="w-4 h-4 mr-2"
@@ -77,7 +110,7 @@ function IngredientList({ ingredients, onDeleteIngredient }) {
               const mayContainAllergens = getAllergenNames(ingredient.mayContain);
 
               return (
-                <tr key={ingredient.id} className="hover:bg-gray-50">
+                <tr key={ingredient.id} className="hover:bg-blue-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
                       {ingredient.name}
