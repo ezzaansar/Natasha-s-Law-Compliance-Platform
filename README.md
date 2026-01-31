@@ -41,6 +41,13 @@ This platform helps small UK food businesses (cafés, bakeries, food trucks) com
 - Visual allergen breakdown showing source ingredients
 - **Print-ready compliance labels**
 
+### Recipe-Level Allergen Overrides (NEW)
+- **Edit allergens per recipe** - add allergens not in ingredients
+- Handle supplier changes and kitchen cross-contamination
+- **Audit logging** - tracks all changes with reasons
+- Visual distinction between inherited and manual allergens
+- Safety-first: can only ADD allergens, never remove inherited ones
+
 ### User Experience
 - **Toast notifications** instead of browser alerts
 - **Confirmation modals** for delete actions
@@ -126,6 +133,8 @@ npm run preview
 │   └── PRD.md                     # Product Requirements Document
 ├── public/
 │   └── favicon.svg                # App icon
+├── AI-LOG.md                      # AI development log
+├── IMPACT_ANALYSIS.md             # Change request analysis
 └── package.json
 ```
 

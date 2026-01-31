@@ -16,7 +16,17 @@ function AppContent() {
 
   const [recipes, setRecipes] = useState(() => {
     const saved = localStorage.getItem('recipes');
-    return saved ? JSON.parse(saved) : SAMPLE_RECIPES;
+    if (saved) {
+      // Migrate old recipes to new schema if needed
+      const parsed = JSON.parse(saved);
+      return parsed.map(recipe => ({
+        ...recipe,
+        allergenOverrides: recipe.allergenOverrides || { contains: [], mayContain: [], reasons: {} },
+        auditLog: recipe.auditLog || [],
+        updatedAt: recipe.updatedAt || recipe.createdAt
+      }));
+    }
+    return SAMPLE_RECIPES;
   });
 
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -58,6 +68,28 @@ function AppContent() {
       id,
       name: recipe?.name || 'this recipe'
     });
+  };
+
+  // Handle allergen override updates for recipes
+  const handleUpdateRecipeOverrides = (recipeId, overrides, reason) => {
+    setRecipes(prev => prev.map(recipe => {
+      if (recipe.id === recipeId) {
+        const newAuditEntry = {
+          action: 'override_updated',
+          changes: overrides,
+          reason: reason,
+          date: new Date().toISOString()
+        };
+        return {
+          ...recipe,
+          allergenOverrides: overrides,
+          auditLog: [...(recipe.auditLog || []), newAuditEntry],
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return recipe;
+    }));
+    addToast('Allergen overrides updated', 'success');
   };
 
   const confirmDelete = () => {
@@ -208,6 +240,7 @@ function AppContent() {
             ingredients={ingredients}
             onAddRecipe={handleAddRecipe}
             onDeleteRecipe={handleDeleteRecipe}
+            onUpdateRecipeOverrides={handleUpdateRecipeOverrides}
           />
         )}
       </main>
